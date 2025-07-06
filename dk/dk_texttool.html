@@ -2,8 +2,10 @@
 <html lang="de">
 <head>
   <meta charset="UTF-8">
-  <title>Dänisch Lernhilfe</title>
+  <title>Dänisch: Textwerkzeug</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow, noarchive, nosnippet, max-image-preview:none, notranslate" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2280%22>🇩🇰</text></svg>">
   <style>
     body {
       font-family: sans-serif;
@@ -80,7 +82,6 @@
   </style>
 </head>
 <body>
-
   <div id="controls" style="display:none;">
     <button id="playBtn">▶️ Play</button>
     <button id="pauseBtn">⏸️ Pause</button>
@@ -89,10 +90,14 @@
   </div>
 
   <div id="textInputSection">
-    <textarea id="inputText" rows="5" placeholder="Gib hier einen dänischen Text ein und klicke auf Weiter"></textarea><br>
+    <textarea id="inputText" rows="12" placeholder="Gib hier einen dänischen Text ein und klicke auf Weiter.
+	
+Ein Klick auf ein Wort = vorlesen
+Doppelklick auf ein Wort = Wörterbuch
+
+Diese Webseite speichert keine Daten. Alles geschieht auf deinem Gerät. Doppelt auf ein Wort klicken oder ein Klick auf DeepL führt zu externen Anbietern (m.dict.cc / deepl.com)"></textarea><br>
     <button id="weiterBtn">Weiter</button>
   </div>
-
   <div id="outputText"></div>
 
   <script>
@@ -126,11 +131,16 @@
       const timeSinceLastTap = now - lastTapTime;
 
       if (timeSinceLastTap < 300) {
-        // Doppelklick / -tap → Wörterbuch
-        const word = e.target.textContent.toLowerCase().replace(/[.,!?]/g, "");
-        const url = `https://m.dict.cc/daenisch-deutsch/${word}.html`;
-        window.open(url, "_blank");
-      } else {
+  // Doppelklick / -tap → Wörterbuch
+  const word = e.target.textContent.toLowerCase().replace(/[.,!?]/g, "");
+  const url = `https://m.dict.cc/daenisch-deutsch/${word}.html`;
+
+  const a = document.createElement('a');
+  a.href = url;
+  a.target = '_blank';
+  a.rel = 'noreferrer noopener';
+  a.click();
+} else {
         // Einzelklick → Vorlesen
         speakWord(e.target.textContent);
       }
@@ -150,7 +160,7 @@
       } else if (!synth.speaking) {
         utterance = new SpeechSynthesisUtterance(fullText);
         utterance.lang = "da-DK";
-        utterance.rate = 0.3;
+        utterance.rate = 0.4;
         synth.speak(utterance);
       }
     });
@@ -163,13 +173,20 @@
       if (synth.speaking) synth.cancel();
     });
 
-    deeplBtn.addEventListener("click", () => {
-      if (!fullText) return;
-      const deeplBase = "https://www.deepl.com/de/translator#da/de/";
-      const encodedText = encodeURIComponent(fullText);
-      const deeplUrl = deeplBase + encodedText;
-      window.open(deeplUrl, "_blank");
-    });
+   deeplBtn.addEventListener("click", () => {
+  if (!fullText) return;
+
+  const deeplBase = "https://www.deepl.com/de/translator#da/de/";
+  const encodedText = encodeURIComponent(fullText);
+  const deeplUrl = deeplBase + encodedText;
+
+  const a = document.createElement('a');
+  a.href = deeplUrl;
+  a.target = '_blank';
+  a.rel = 'noreferrer noopener'; // schützt vor Referrer & Tab-Hijacking
+  a.click();
+});
+
   </script>
 </body>
 </html>
